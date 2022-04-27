@@ -1,4 +1,4 @@
-package com.cider_android.newarchitecture.components;
+package com.cidermobile.newarchitecture.components;
 
 import com.facebook.jni.HybridData;
 import com.facebook.proguard.annotations.DoNotStrip;

@@ -1,4 +1,4 @@
-package com.cider_android;
+package com.cidermobile;
 
 import com.apple.android.sdk.authentication.*;
 import com.facebook.react.bridge.ActivityEventListener;

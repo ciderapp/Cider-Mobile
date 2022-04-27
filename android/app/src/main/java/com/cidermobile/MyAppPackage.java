@@ -1,4 +1,4 @@
-package com.cider_android;
+package com.cidermobile;
 import com.facebook.react.ReactPackage;
 import com.facebook.react.bridge.NativeModule;
 import com.facebook.react.bridge.ReactApplicationContext;

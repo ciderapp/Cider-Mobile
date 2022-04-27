@@ -15,9 +15,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-               BuildableName = "Cider_Android.app"
-               BlueprintName = "Cider_Android"
-               ReferencedContainer = "container:Cider_Android.xcodeproj">
+               BuildableName = "CiderMobile.app"
+               BlueprintName = "CiderMobile"
+               ReferencedContainer = "container:CiderMobile.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -33,9 +33,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "00E356ED1AD99517003FC87E"
-               BuildableName = "Cider_AndroidTests.xctest"
-               BlueprintName = "Cider_AndroidTests"
-               ReferencedContainer = "container:Cider_Android.xcodeproj">
+               BuildableName = "CiderMobileTests.xctest"
+               BlueprintName = "CiderMobileTests"
+               ReferencedContainer = "container:CiderMobile.xcodeproj">
             </BuildableReference>
          </TestableReference>
       </Testables>
@@ -55,9 +55,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-            BuildableName = "Cider_Android.app"
-            BlueprintName = "Cider_Android"
-            ReferencedContainer = "container:Cider_Android.xcodeproj">
+            BuildableName = "CiderMobile.app"
+            BlueprintName = "CiderMobile"
+            ReferencedContainer = "container:CiderMobile.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </LaunchAction>
@@ -72,9 +72,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-            BuildableName = "Cider_Android.app"
-            BlueprintName = "Cider_Android"
-            ReferencedContainer = "container:Cider_Android.xcodeproj">
+            BuildableName = "CiderMobile.app"
+            BlueprintName = "CiderMobile"
+            ReferencedContainer = "container:CiderMobile.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>

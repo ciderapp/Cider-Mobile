@@ -1,4 +1,4 @@
-package com.cider_android.newarchitecture;
+package com.cidermobile.newarchitecture;
 
 import android.app.Application;
 import androidx.annotation.NonNull;
@@ -19,9 +19,9 @@ import com.facebook.react.fabric.CoreComponentsRegistry;
 import com.facebook.react.fabric.EmptyReactNativeConfig;
 import com.facebook.react.fabric.FabricJSIModuleProvider;
 import com.facebook.react.uimanager.ViewManagerRegistry;
-import com.cider_android.BuildConfig;
-import com.cider_android.newarchitecture.components.MainComponentsRegistry;
-import com.cider_android.newarchitecture.modules.MainApplicationTurboModuleManagerDelegate;
+import com.cidermobile.BuildConfig;
+import com.cidermobile.newarchitecture.components.MainComponentsRegistry;
+import com.cidermobile.newarchitecture.modules.MainApplicationTurboModuleManagerDelegate;
 import java.util.ArrayList;
 import java.util.List;
 
