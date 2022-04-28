@@ -29,7 +29,6 @@ const App = () => {
           return res.token;
         });
         setDevToken(fetched_devToken);
-        console.log(fetched_devToken);
 
         // Fetch usrToken
         let fetched_usrToken = '';
@@ -63,7 +62,6 @@ const App = () => {
         }
 
         setUsrToken(fetched_usrToken);
-        console.log(fetched_usrToken);
       } catch (error) {
         console.log(error);
       }
@@ -72,10 +70,9 @@ const App = () => {
 
   return (
     <Text>
-      {devToken !== '' ? (
+      {usrToken !== '' ? (
         <Text>
-          Hello World! you cock suckers. token {devToken} ===== usrToken
-          {usrToken}
+          Hello World! you cock suckers. Tokens Loaded!
         </Text>
       ) : (
         <Text>Hello World! you cock suckers.</Text>
