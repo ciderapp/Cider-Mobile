@@ -1,4 +1,4 @@
-package com.example.cider_mobile
+package sh.cider.android
 
 import io.flutter.embedding.android.FlutterActivity
 
