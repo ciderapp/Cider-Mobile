@@ -1,6 +1,16 @@
-# Cider-Mobile
+# cider_mobile
 
-[Cider](https://github.com/ciderapp/Cider) rewritten in [React-Native](https://reactnative.dev) for Mobile  
-Not much else to it
+A new Flutter project.
 
-**Note: At this moment, this only supports Android. IOS Support in the works.**
+## Getting Started
+
+This project is a starting point for a Flutter application.
+
+A few resources to get you started if this is your first Flutter project:
+
+- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
+- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+
+For help getting started with Flutter development, view the
+[online documentation](https://docs.flutter.dev/), which offers tutorials,
+samples, guidance on mobile development, and a full API reference.
