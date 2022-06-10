@@ -1,7 +1,9 @@
 import React, {useEffect, useState} from 'react';
-import {Text, NativeModules} from 'react-native';
+import {Text, NativeModules, View} from 'react-native';
 import EncryptedStorage from 'react-native-encrypted-storage';
 const {AMTokenProvider} = NativeModules;
+
+import CiderLogo from '../assets/cider-round.svg';
 
 const fetchJson = async (url: string, headers?: any) => {
   return await fetch(url, {
@@ -20,6 +22,7 @@ const App = () => {
   const [usrToken, setUsrToken] = useState('');
 
   useEffect(() => {
+    // Fetch the auth tokens
     (async () => {
       try {
         // Fetch devToken
@@ -69,15 +72,13 @@ const App = () => {
   }, []);
 
   return (
-    <Text>
+    <View>
       {usrToken !== '' ? (
-        <Text>
-          Hello World! you cock suckers. Tokens Loaded!
-        </Text>
+        <Text>Hello World! Tokens Loaded!</Text>
       ) : (
-        <Text>Hello World! you cock suckers.</Text>
+        <CiderLogo />
       )}
-    </Text>
+    </View>
   );
 };
 
