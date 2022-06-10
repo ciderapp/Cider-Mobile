@@ -50,11 +50,7 @@ class MainActivity: FlutterActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if(requestCode != REQUESTCODE_APPLEMUSIC_AUTH)
             return super.onActivityResult(requestCode, resultCode, data)
-
-        if(resultCode != Activity.RESULT_OK) {
-            _result.error("MKAUTHFAIL", null, null);
-            return
-        }
+        
         var token = _authMgr.handleTokenResult(data)
         if(token.isError)
             _result.error("MKAUTHFAIL","User Auth Failure", token.error.toString())
