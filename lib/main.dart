@@ -7,6 +7,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 
 import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 import 'home.dart';
 import 'rounded_navbar.dart';
@@ -57,9 +58,12 @@ class _MyAppState extends State<MyApp> {
 
   // MusicKit initialization
   Future<void> _musicKitAuthentication() async {
+    PackageInfo packageInfo = await PackageInfo.fromPlatform();
+    String version = packageInfo.version;
+
     // Fetch developer token via FETCH api.cider.sh
     final res = await getJson("https://api.cider.sh/v1", {
-      'user-agent': 'Cider/0.0.1',
+      'user-agent': 'Cider/$version',
     });
     if (res['statusCodeError'] != null) {
       if (kDebugMode) {
