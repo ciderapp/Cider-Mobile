@@ -9,8 +9,13 @@ import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
-import 'home.dart';
 import 'rounded_navbar.dart';
+
+// Pages
+import 'pages/home.dart';
+import 'pages/listen.dart';
+import 'pages/browse.dart';
+import 'pages/radio.dart';
 
 void main() {
   runApp(const MyApp());
@@ -177,11 +182,7 @@ class _MyAppState extends State<MyApp> {
         // Oh nice. Something to easily set colors throughout the app
         canvasColor: Colors.grey[900],
         primaryColor: Colors.grey[700],
-        primaryTextTheme: const TextTheme(
-          headline6: TextStyle(
-            color: Colors.white,
-          ),
-        ),
+        primaryTextTheme: Typography.whiteCupertino,
         primaryIconTheme: const IconThemeData(
           color: Colors.white,
         ),
