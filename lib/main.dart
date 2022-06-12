@@ -42,7 +42,6 @@ class _MyAppState extends State<MyApp> {
   final List<Widget> _pages = [
     const HomeScreen(),
     const ListenScreen(),
-    //const MenuScreen(),
     const BrowseScreen(),
     const RadioScreen(),
   ];
@@ -170,6 +169,17 @@ class _MyAppState extends State<MyApp> {
     // Show app
     return MaterialApp(
       title: 'Cider',
+      theme: ThemeData(
+        // Oh nice. Something to easily set colors throughout the app
+        canvasColor: Colors.grey[900],
+        primaryColor: Colors.grey[700],
+        primaryTextTheme: const TextTheme(
+          headline6: TextStyle(
+            color: Colors.white,
+          ),
+        ),
+        visualDensity: VisualDensity.adaptivePlatformDensity,
+      ),
       debugShowCheckedModeBanner: false,
       home: SafeArea(
         child: Scaffold(

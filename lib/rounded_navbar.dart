@@ -17,26 +17,48 @@ class RoundedNavbarItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (selected) {
-      return OutlinedButton.icon(
-        onPressed: onTap,
-        icon: icon,
-        label: Text(title),
-        style: ButtonStyle(
-          shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-            RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(18.0),
-              side: const BorderSide(
-                color: Colors.red,
-              ),
+      return Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(50),
+          color: Theme.of(context).primaryColor,
+        ),
+        padding: const EdgeInsets.all(8),
+        child: Column(
+          children: [
+            icon,
+            const SizedBox(width: 8),
+            Text(
+              title,
+              style: Theme.of(context).primaryTextTheme.headline6,
             ),
-          ),
+          ],
         ),
       );
     }
 
-    return IconButton(
-      icon: icon,
+    return ElevatedButton(
       onPressed: onTap,
+      style: ElevatedButton.styleFrom(
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(
+            Radius.circular(50),
+          ),
+        ),
+        padding: const EdgeInsets.all(8),
+        primary: Colors.transparent,
+        shadowColor: Colors.transparent,
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          icon,
+          const SizedBox(width: 8),
+          Text(
+            title,
+            style: Theme.of(context).primaryTextTheme.headline6,
+          ),
+        ],
+      ),
     );
   }
 }
@@ -72,11 +94,21 @@ class _RoundedNavbarState extends State<RoundedNavbar> {
           },
         ));
 
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      children: [
-        ...items,
-      ],
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(50),
+        border: Border.all(
+          color: Theme.of(context).primaryColor,
+          width: 2,
+        ),
+      ),
+      padding: EdgeInsets.zero,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          ...items,
+        ],
+      ),
     );
   }
 }

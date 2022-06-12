@@ -5,7 +5,10 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Text('Home');
+    return Text(
+      'Home',
+      style: Theme.of(context).primaryTextTheme.headline6,
+    );
   }
 }
 
@@ -14,7 +17,10 @@ class ListenScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Text('Listen Now');
+    return Text(
+      'Listen Now',
+      style: Theme.of(context).primaryTextTheme.headline6,
+    );
   }
 }
 
@@ -23,7 +29,10 @@ class BrowseScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Text('Browse');
+    return Text(
+      'Browse',
+      style: Theme.of(context).primaryTextTheme.headline6,
+    );
   }
 }
 
@@ -32,7 +41,10 @@ class RadioScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Text('Radio');
+    return Text(
+      'Radio',
+      style: Theme.of(context).primaryTextTheme.headline6,
+    );
   }
 }
 
@@ -41,6 +53,9 @@ class MenuScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Text('Menu');
+    return Text(
+      'Menu',
+      style: Theme.of(context).primaryTextTheme.headline6,
+    );
   }
 }
