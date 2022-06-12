@@ -9,11 +9,38 @@ class HomeScreen extends StatelessWidget {
   }
 }
 
-class SearchScreen extends StatelessWidget {
-  const SearchScreen({Key? key}) : super(key: key);
+class ListenScreen extends StatelessWidget {
+  const ListenScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return const Text('Search');
+    return const Text('Listen Now');
+  }
+}
+
+class BrowseScreen extends StatelessWidget {
+  const BrowseScreen({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return const Text('Browse');
+  }
+}
+
+class RadioScreen extends StatelessWidget {
+  const RadioScreen({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return const Text('Radio');
+  }
+}
+
+class MenuScreen extends StatelessWidget {
+  const MenuScreen({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return const Text('Menu');
   }
 }

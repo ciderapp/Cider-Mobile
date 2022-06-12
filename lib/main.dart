@@ -3,11 +3,13 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 import 'home.dart';
+import 'rounded_navbar.dart';
 
 void main() {
   runApp(const MyApp());
@@ -39,7 +41,10 @@ class _MyAppState extends State<MyApp> {
 
   final List<Widget> _pages = [
     const HomeScreen(),
-    const SearchScreen(),
+    const ListenScreen(),
+    //const MenuScreen(),
+    const BrowseScreen(),
+    const RadioScreen(),
   ];
   int _page = 0;
 
@@ -170,40 +175,35 @@ class _MyAppState extends State<MyApp> {
         child: Scaffold(
           body: Column(
             children: [
-              BottomNavigationBar(
-                currentIndex: _page,
+              RoundedNavbar(
+                items: const [
+                  RoundedNavbarItem(
+                    icon: Icon(Icons.home_outlined),
+                    title: 'Home',
+                  ),
+                  RoundedNavbarItem(
+                    icon: Icon(Icons.play_circle_outline),
+                    title: 'Listen Now',
+                  ),
+                  RoundedNavbarItem(
+                    icon: Icon(Icons.language_outlined),
+                    title: 'Browse',
+                  ),
+                  RoundedNavbarItem(
+                    icon: Icon(Icons.sensors_outlined),
+                    title: 'Radio',
+                  ),
+                ],
                 onTap: (index) {
+                  if (kDebugMode) {
+                    print('index $index');
+                  }
                   setState(() {
                     _page = index;
                   });
                 },
-                items: const [
-                  BottomNavigationBarItem(
-                    icon: Icon(Icons.home),
-                    label: 'Home',
-                  ),
-                  BottomNavigationBarItem(
-                    icon: Icon(Icons.play_circle_outline),
-                    label: 'Listen Now',
-                  ),
-                  BottomNavigationBarItem(
-                    icon: Icon(Icons.language_outlined),
-                    label: 'Browse',
-                  ),
-                  BottomNavigationBarItem(
-                    icon: Icon(Icons.sensors_outlined),
-                    label: 'Radio',
-                  ),
-                  BottomNavigationBarItem(
-                    icon: Icon(Icons.search),
-                    label: 'Search',
-                  ),
-                ],
-                showUnselectedLabels: false,
-                selectedItemColor: Colors.black,
-                unselectedItemColor: Colors.grey,
               ),
-              Text('$_page'),
+              _pages[_page],
             ],
           ),
         ),
