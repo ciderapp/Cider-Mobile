@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 
+// FIXME: Overflows horizontally when Item doesn't fit
+// FIXME: Items are not the same size when selected
+
 class RoundedNavbarItem extends StatelessWidget {
   final Widget icon;
   final String title;
@@ -16,49 +19,38 @@ class RoundedNavbarItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final col = Column(
+      children: [
+        icon,
+        Text(
+          title,
+          style: Theme.of(context).primaryTextTheme.headline6,
+        ),
+      ],
+    );
+
     if (selected) {
       return Container(
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(50),
+          borderRadius: BorderRadius.circular(10),
           color: Theme.of(context).primaryColor,
         ),
-        padding: const EdgeInsets.all(8),
-        child: Column(
-          children: [
-            icon,
-            const SizedBox(width: 8),
-            Text(
-              title,
-              style: Theme.of(context).primaryTextTheme.headline6,
-            ),
-          ],
-        ),
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        child: col,
       );
     }
 
     return ElevatedButton(
       onPressed: onTap,
       style: ElevatedButton.styleFrom(
-        shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.all(
-            Radius.circular(50),
-          ),
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10),
         ),
-        padding: const EdgeInsets.all(8),
         primary: Colors.transparent,
         shadowColor: Colors.transparent,
       ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          icon,
-          const SizedBox(width: 8),
-          Text(
-            title,
-            style: Theme.of(context).primaryTextTheme.headline6,
-          ),
-        ],
-      ),
+      child: col,
     );
   }
 }
@@ -94,20 +86,23 @@ class _RoundedNavbarState extends State<RoundedNavbar> {
           },
         ));
 
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(50),
-        border: Border.all(
-          color: Theme.of(context).primaryColor,
-          width: 2,
+    return Center(
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: Theme.of(context).primaryColor,
+            width: 1,
+          ),
         ),
-      ),
-      padding: EdgeInsets.zero,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: [
-          ...items,
-        ],
+        width: MediaQuery.of(context).size.width * 0.9,
+        padding: EdgeInsets.zero,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            ...items,
+          ],
+        ),
       ),
     );
   }

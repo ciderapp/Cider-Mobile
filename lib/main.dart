@@ -178,6 +178,9 @@ class _MyAppState extends State<MyApp> {
             color: Colors.white,
           ),
         ),
+        primaryIconTheme: const IconThemeData(
+          color: Colors.white,
+        ),
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
       debugShowCheckedModeBanner: false,
