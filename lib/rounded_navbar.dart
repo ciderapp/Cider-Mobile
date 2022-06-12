@@ -7,7 +7,7 @@ class RoundedNavbarItem extends StatelessWidget {
   final Widget icon;
   final String title;
   final bool selected;
-  final void Function()? onTap;
+  final VoidCallback? onTap;
 
   const RoundedNavbarItem({
     Key? key,
@@ -105,7 +105,7 @@ class _RoundedNavbarState extends State<RoundedNavbar> {
           ),
         ),
         width: MediaQuery.of(context).size.width * 0.9,
-        padding: EdgeInsets.zero,
+        padding: const EdgeInsets.all(1),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
