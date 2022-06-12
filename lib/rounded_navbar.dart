@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 // FIXME: Overflows horizontally when Item doesn't fit
-// FIXME: Items are not the same size when selected
+// TODO: Nice Animation when Item is selected
 
 class RoundedNavbarItem extends StatelessWidget {
   final Widget icon;
@@ -20,11 +20,12 @@ class RoundedNavbarItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final col = Column(
+      mainAxisSize: MainAxisSize.min,
       children: [
         icon,
         Text(
           title,
-          style: Theme.of(context).primaryTextTheme.headline6,
+          style: Theme.of(context).primaryTextTheme.bodySmall,
         ),
       ],
     );
@@ -35,7 +36,8 @@ class RoundedNavbarItem extends StatelessWidget {
           borderRadius: BorderRadius.circular(10),
           color: Theme.of(context).primaryColor,
         ),
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        padding: EdgeInsets.zero,
+        //padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
         child: col,
       );
     }
@@ -43,12 +45,15 @@ class RoundedNavbarItem extends StatelessWidget {
     return ElevatedButton(
       onPressed: onTap,
       style: ElevatedButton.styleFrom(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        padding: EdgeInsets.zero,
+        //padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(10),
         ),
         primary: Colors.transparent,
         shadowColor: Colors.transparent,
+        splashFactory: NoSplash.splashFactory,
       ),
       child: col,
     );
@@ -74,7 +79,9 @@ class _RoundedNavbarState extends State<RoundedNavbar> {
 
   @override
   Widget build(BuildContext context) {
-    final items = widget.items.map((item) => RoundedNavbarItem(
+    final items = widget.items.map(
+      (item) => Expanded(
+        child: RoundedNavbarItem(
           icon: item.icon,
           title: item.title,
           selected: _active == widget.items.indexOf(item),
@@ -84,7 +91,9 @@ class _RoundedNavbarState extends State<RoundedNavbar> {
             });
             widget.onTap?.call(_active);
           },
-        ));
+        ),
+      ),
+    );
 
     return Center(
       child: Container(
@@ -98,7 +107,7 @@ class _RoundedNavbarState extends State<RoundedNavbar> {
         width: MediaQuery.of(context).size.width * 0.9,
         padding: EdgeInsets.zero,
         child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
             ...items,
           ],
