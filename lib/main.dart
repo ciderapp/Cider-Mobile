@@ -45,12 +45,6 @@ class _MyAppState extends State<MyApp> {
     encryptedSharedPreferences: true,
   ));
 
-  final List<Widget> _pages = [
-    const HomeScreen(),
-    const ListenScreen(),
-    const BrowseScreen(),
-    const RadioScreen(),
-  ];
   int _page = 0;
 
   String _devToken = "";
@@ -60,6 +54,32 @@ class _MyAppState extends State<MyApp> {
 
   bool _hasErrored = false;
   String _errorMessage = "";
+
+  // MusicKit API
+  Future<Map<String, dynamic>> amAPI(String endpoint, [Map<String, dynamic>? query]) async {
+    if (_usrToken.isEmpty) {
+      return {'error': 'User token is empty'};
+    }
+
+    final headers = {
+      'Authorization': 'Bearer $_devToken',
+      'Music-User-Token': _usrToken,
+    };
+    final queryString = query?.entries.map((entry) {
+      return '${entry.key}=${entry.value}';
+    }).join('&');
+
+    final uri = 'https://api.music.apple.com/v1/$endpoint?${queryString ?? ''}';
+    final res = await getJson(uri, headers);
+    if (res['statusCodeError'] != null) {
+      setState(() {
+        _errorMessage = "Call to amAPI endpoint $endpoint failed with status code ${res['statusCodeError']}";
+      });
+      return {'error': res['statusCodeError']};
+    }
+
+    return res;
+  }
 
   // MusicKit initialization
   Future<void> _musicKitAuthentication() async {
@@ -77,17 +97,14 @@ class _MyAppState extends State<MyApp> {
       return;
     }
 
-    // Is this redundant?
-    setState(() {
-      _devToken = res['token'];
-    });
+    // Not in a 'setState' because this does not change the state of the app
+    _devToken = res['token'];
 
     var usrToken = await storage.read(key: "usrToken");
     if (usrToken != null) {
       // Verify user token
-      final res = await getJson('https://api.music.apple.com/v1/me/library/songs', {
-        'Authorization': 'Bearer $_devToken',
-        'Music-User-Token': usrToken,
+      final res = await amAPI("/v1/me/library/songs", {
+        'limit': 1,
       });
       if (res['statusCodeError'] != null) {
         // Invalid token, delete it
@@ -175,6 +192,14 @@ class _MyAppState extends State<MyApp> {
       );
     }
 
+    // Create Screens
+    final List<Widget> pages = [
+      HomeScreen(amAPICall: amAPI),
+      const ListenScreen(),
+      const BrowseScreen(),
+      const RadioScreen(),
+    ];
+
     // Show app
     return MaterialApp(
       title: 'Cider',
@@ -221,7 +246,7 @@ class _MyAppState extends State<MyApp> {
                   });
                 },
               ),
-              _pages[_page],
+              pages[_page],
             ],
           ),
         ),
