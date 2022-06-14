@@ -9,7 +9,7 @@ import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
-import 'rounded_navbar.dart';
+import 'components/rounded_navbar.dart';
 
 // Pages
 import 'pages/home.dart';
@@ -27,7 +27,7 @@ Future<dynamic> getJson(String uri, dynamic headers) async {
   if (response.statusCode == 200) {
     return json.decode(response.body);
   } else {
-    return {'statusCodeError': response.statusCode};
+    return {'statusCodeError': response.statusCode, 'response': response.body};
   }
 }
 
@@ -75,6 +75,9 @@ class _MyAppState extends State<MyApp> {
       setState(() {
         _errorMessage = "Call to amAPI endpoint $endpoint failed with status code ${res['statusCodeError']}";
       });
+      if (res['statusCodeError'] == 400) {
+        print("You've fucked up. Figure out what. ${res['response']}");
+      }
       return {'error': res['statusCodeError']};
     }
 
@@ -218,21 +221,21 @@ class _MyAppState extends State<MyApp> {
         child: Scaffold(
           body: Column(
             children: [
-              RoundedNavbar(
+              RoundedNavBar(
                 items: const [
-                  RoundedNavbarItem(
+                  RoundedNavBarItem(
                     icon: Icon(Icons.home_outlined),
                     title: 'Home',
                   ),
-                  RoundedNavbarItem(
+                  RoundedNavBarItem(
                     icon: Icon(Icons.play_circle_outline),
                     title: 'Listen Now',
                   ),
-                  RoundedNavbarItem(
+                  RoundedNavBarItem(
                     icon: Icon(Icons.language_outlined),
                     title: 'Browse',
                   ),
-                  RoundedNavbarItem(
+                  RoundedNavBarItem(
                     icon: Icon(Icons.sensors_outlined),
                     title: 'Radio',
                   ),

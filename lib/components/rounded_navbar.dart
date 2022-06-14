@@ -1,15 +1,17 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 
 // FIXME: Overflows horizontally when Item doesn't fit
 // TODO: Nice Animation when Item is selected
 
-class RoundedNavbarItem extends StatelessWidget {
+class RoundedNavBarItem extends StatelessWidget {
   final Widget icon;
   final String title;
   final bool selected;
   final VoidCallback? onTap;
 
-  const RoundedNavbarItem({
+  const RoundedNavBarItem({
     Key? key,
     required this.icon,
     required this.title,
@@ -60,28 +62,28 @@ class RoundedNavbarItem extends StatelessWidget {
   }
 }
 
-class RoundedNavbar extends StatefulWidget {
-  final List<RoundedNavbarItem> items;
+class RoundedNavBar extends StatefulWidget {
+  final List<RoundedNavBarItem> items;
   final Function(int)? onTap;
 
-  const RoundedNavbar({
+  const RoundedNavBar({
     Key? key,
     required this.items,
     this.onTap,
   }) : super(key: key);
 
   @override
-  State<RoundedNavbar> createState() => _RoundedNavbarState();
+  State<RoundedNavBar> createState() => _RoundedNavBarState();
 }
 
-class _RoundedNavbarState extends State<RoundedNavbar> {
+class _RoundedNavBarState extends State<RoundedNavBar> {
   var _active = 0;
 
   @override
   Widget build(BuildContext context) {
     final items = widget.items.map(
       (item) => Expanded(
-        child: RoundedNavbarItem(
+        child: RoundedNavBarItem(
           icon: item.icon,
           title: item.title,
           selected: _active == widget.items.indexOf(item),
