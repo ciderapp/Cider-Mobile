@@ -11,25 +11,19 @@ class HomeScreen extends BasePage {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  var _string = "";
-  var _imageURL = "";
+  var _albumID = "";
 
   // This is where you'll get the song data from the Apple Music API
   // (among other things)
   Future<void> asyncInit() async {
-    final res = await widget.amAPICall("me/recent/played/tracks", {
+    final res = await widget.amAPICall("me/recent/played", {
       "limit": "1",
     });
-    if (res['errors'] == null) {
-      setState(() {
-        _string = "${res['data'][0]['attributes']['name']} by ${res['data'][0]['attributes']['artistName']}";
-        _imageURL = res['data'][0]['attributes']['artwork']['url'];
-      });
-    } else {
-      setState(() {
-        _string = "Error";
-      });
-    }
+    if (res['errors'] != null) return;
+
+    setState(() {
+      _albumID = res['data'][0]['id'];
+    });
   }
 
   @override
@@ -43,15 +37,12 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Text(
-          'Home \n$_string',
-          style: Theme.of(context).primaryTextTheme.headline6,
-        ),
         SizedBox(
           width: 300,
           height: 300,
           child: AlbumListItem(
-            imageURL: _imageURL,
+            amAPICall: widget.amAPICall,
+            albumID: _albumID,
           ),
         ),
       ],

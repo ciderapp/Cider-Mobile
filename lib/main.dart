@@ -70,6 +70,7 @@ class _MyAppState extends State<MyApp> {
     }).join('&');
 
     final uri = 'https://api.music.apple.com/v1/$endpoint?${queryString ?? ''}';
+    print('amAPI: $uri');
     final res = await getJson(uri, headers);
     if (res['statusCodeError'] != null) {
       setState(() {
@@ -106,7 +107,7 @@ class _MyAppState extends State<MyApp> {
     var usrToken = await storage.read(key: "usrToken");
     if (usrToken != null) {
       // Verify user token
-      final res = await amAPI("/v1/me/library/songs", {
+      final res = await amAPI("me/library/songs", {
         'limit': 1,
       });
       if (res['statusCodeError'] != null) {
