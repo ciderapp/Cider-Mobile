@@ -52,7 +52,6 @@ class _HomeScreenState extends State<HomeScreen> {
           height: 300,
           child: AlbumListItem(
             imageURL: _imageURL,
-            apiCall: widget.amAPICall,
           ),
         ),
       ],
