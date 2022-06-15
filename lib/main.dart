@@ -114,7 +114,7 @@ class _MyAppState extends State<MyApp> {
       return '${entry.key}=${entry.value}';
     }).join('&');
 
-    final uri = 'https://api.music.apple.com/v1/$endpoint?${queryString ?? ''}';
+    final uri = "https://api.music.apple.com/v1/$endpoint${queryString != null ? '?$queryString' : ''}";
     if (kDebugMode) print('amAPI: $uri');
     final res = await getJsonCache(uri, headers);
     if (res['statusCodeError'] != null) {
@@ -287,6 +287,9 @@ class _MyAppState extends State<MyApp> {
                     _page = index;
                   });
                 },
+              ),
+              const SizedBox(
+                height: 2,
               ),
               pages[_page],
             ],

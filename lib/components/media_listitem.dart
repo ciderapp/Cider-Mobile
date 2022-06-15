@@ -4,18 +4,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:cider_mobile/misc.dart';
 
-enum MediaType {
-  album,
-  song,
-  playlist,
-}
-
 class MediaListItem extends StatefulWidget {
   final AMAPICallback amAPICall;
   final String id;
   final MediaType type;
+  final VoidCallback onTap;
 
-  const MediaListItem({Key? key, required this.amAPICall, required this.id, required this.type}) : super(key: key);
+  const MediaListItem({Key? key, required this.amAPICall, required this.id, required this.type, required this.onTap})
+      : super(key: key);
 
   @override
   State<MediaListItem> createState() => _MediaListItemState();
@@ -105,11 +101,14 @@ class _MediaListItemState extends State<MediaListItem> {
               borderRadius: BorderRadius.circular(10),
             ),
           ),
-          child: Container(
-            decoration: BoxDecoration(
-              color: bgColor,
+          child: ElevatedButton(
+            onPressed: widget.onTap,
+            style: ElevatedButton.styleFrom(
+              primary: bgColor,
+              //splashFactory: NoSplash.splashFactory,
+              maximumSize: Size(constraints.maxWidth, double.infinity),
+              padding: EdgeInsets.zero,
             ),
-            width: constraints.maxWidth,
             child: Column(
               mainAxisAlignment: MainAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,

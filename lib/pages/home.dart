@@ -1,9 +1,8 @@
-import 'dart:collection';
-
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'basepage.dart';
 
+import 'package:cider_mobile/misc.dart';
+import 'package:cider_mobile/pages/mediadetail.dart';
 import 'package:cider_mobile/components/media_listitem.dart';
 
 class HomeScreen extends BasePage {
@@ -82,6 +81,17 @@ class _HomeScreenState extends State<HomeScreen> {
               amAPICall: widget.amAPICall,
               id: e.key,
               type: e.value,
+              onTap: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => MediaDetail(
+                      amAPICall: widget.amAPICall,
+                      id: e.key,
+                      type: e.value,
+                    ),
+                  ),
+                );
+              },
             ),
           ),
         );
@@ -108,6 +118,17 @@ class _HomeScreenState extends State<HomeScreen> {
               amAPICall: widget.amAPICall,
               id: e.key,
               type: e.value,
+              onTap: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => MediaDetail(
+                      amAPICall: widget.amAPICall,
+                      id: e.key,
+                      type: e.value,
+                    ),
+                  ),
+                );
+              },
             ),
           ),
         );
