@@ -60,8 +60,8 @@ class _MediaListItemState extends State<MediaListItem> {
 
         final placeholder = SvgPicture.asset(
           "assets/MissingArtwork.svg",
-          width: size.toDouble(),
-          height: size.toDouble(),
+          width: constraints.maxWidth,
+          height: constraints.maxWidth,
         );
 
         var name = "";
@@ -115,12 +115,17 @@ class _MediaListItemState extends State<MediaListItem> {
                 ),
                 Text(
                   name,
+                  softWrap: false,
+                  // TODO: Figure out per-syllable elipsis
+                  overflow: TextOverflow.fade,
                   style: Theme.of(context).textTheme.subtitle1!.copyWith(
                         color: txtColor1,
                       ),
                 ),
                 Text(
                   artistName,
+                  softWrap: false,
+                  overflow: TextOverflow.fade,
                   style: Theme.of(context).textTheme.subtitle2!.copyWith(
                         color: txtColor2,
                       ),
