@@ -20,7 +20,7 @@ class _HomeScreenState extends State<HomeScreen> {
   // (among other things)
   Future<void> asyncInit() async {
     final res = await widget.amAPICall("me/recent/played", {
-      "limit": "3",
+      "limit": 10,
     });
     if (res['errors'] != null) return;
 
