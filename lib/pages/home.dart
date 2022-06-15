@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'basepage.dart';
 
-import 'package:cider_mobile/components/album_listitem.dart';
+import 'package:cider_mobile/components/media_listitem.dart';
 
 class HomeScreen extends BasePage {
   const HomeScreen({Key? key, required super.amAPICall}) : super(key: key);
@@ -38,11 +38,11 @@ class _HomeScreenState extends State<HomeScreen> {
     return Column(
       children: [
         SizedBox(
-          width: 300,
-          height: 300,
-          child: AlbumListItem(
+          width: 200,
+          child: MediaListItem(
             amAPICall: widget.amAPICall,
-            albumID: _albumID,
+            id: _albumID,
+            type: MediaType.album,
           ),
         ),
       ],
