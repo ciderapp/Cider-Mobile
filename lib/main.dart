@@ -212,6 +212,7 @@ class _MyAppState extends State<MyApp> {
         canvasColor: Colors.grey[900],
         primaryColor: Colors.grey[700],
         primaryTextTheme: Typography.whiteCupertino,
+        textTheme: Typography.whiteCupertino,
         primaryIconTheme: const IconThemeData(
           color: Colors.white,
         ),

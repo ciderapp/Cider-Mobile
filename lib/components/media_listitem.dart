@@ -7,6 +7,7 @@ import 'package:cider_mobile/misc.dart';
 enum MediaType {
   album,
   song,
+  playlist,
 }
 
 class MediaListItem extends StatefulWidget {
@@ -84,7 +85,11 @@ class _MediaListItemState extends State<MediaListItem> {
           );
 
           name = _attributes!['name'];
-          artistName = _attributes!['artistName'];
+          if (widget.type != MediaType.playlist) {
+            artistName = _attributes!['artistName'];
+          } else {
+            artistName = _attributes!['description']['standard'];
+          }
 
           if (name == "") name = "Unknown ${widget.type.name}";
           if (artistName == "") artistName = "Unknown Artist";
@@ -115,6 +120,7 @@ class _MediaListItemState extends State<MediaListItem> {
                 ),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 8),
+                  // TODO: Autoscroll on overflow
                   child: Text(
                     name,
                     softWrap: false,
