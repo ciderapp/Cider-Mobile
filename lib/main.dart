@@ -3,11 +3,14 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 
 import 'package:http/http.dart' as http;
+import 'package:flutter_cache_manager/flutter_cache_manager.dart';
+
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+
+import 'package:flutter_svg/flutter_svg.dart';
 
 import 'components/rounded_navbar.dart';
 
@@ -26,9 +29,51 @@ Future<dynamic> getJson(String uri, dynamic headers) async {
   final response = await http.get(url, headers: headers);
   if (response.statusCode == 200) {
     return json.decode(response.body);
-  } else {
-    return {'statusCodeError': response.statusCode, 'response': response.body};
   }
+
+  return {'statusCodeError': response.statusCode, 'response': response.body};
+}
+
+Future<dynamic> getJsonCache(String uri, dynamic headers) async {
+  final res = await DefaultCacheManager().getSingleFile(
+    uri,
+    headers: headers,
+  );
+
+  if (await res.exists()) {
+    return json.decode(await res.readAsString());
+  }
+
+  // Try normal request, then actually fail
+  var url = Uri.parse(uri);
+  final response = await http.get(url, headers: headers);
+  if (response.statusCode == 200) {
+    if (kDebugMode) print("Fetched from network.");
+
+    // Shamelessly stolen from flutter_cache_manager src lol
+    var ageDuration = const Duration(days: 7);
+    final controlHeader = response.headers['Cache-Control'];
+    if (controlHeader != null) {
+      final controlSettings = controlHeader.split(',');
+      for (final setting in controlSettings) {
+        final sanitizedSetting = setting.trim().toLowerCase();
+        if (sanitizedSetting == 'no-cache') {
+          ageDuration = const Duration();
+        }
+        if (sanitizedSetting.startsWith('max-age=')) {
+          var validSeconds = int.tryParse(sanitizedSetting.split('=')[1]) ?? 0;
+          if (validSeconds > 0) {
+            ageDuration = Duration(seconds: validSeconds);
+          }
+        }
+      }
+    }
+
+    await DefaultCacheManager().putFile(uri, response.bodyBytes, eTag: response.headers['etag'], maxAge: ageDuration);
+    return json.decode(response.body);
+  }
+
+  return {'statusCodeError': response.statusCode, 'response': response.body};
 }
 
 class MyApp extends StatefulWidget {
@@ -70,14 +115,14 @@ class _MyAppState extends State<MyApp> {
     }).join('&');
 
     final uri = 'https://api.music.apple.com/v1/$endpoint?${queryString ?? ''}';
-    print('amAPI: $uri');
-    final res = await getJson(uri, headers);
+    if (kDebugMode) print('amAPI: $uri');
+    final res = await getJsonCache(uri, headers);
     if (res['statusCodeError'] != null) {
       setState(() {
         _errorMessage = "Call to amAPI endpoint $endpoint failed with status code ${res['statusCodeError']}";
       });
       if (res['statusCodeError'] == 400) {
-        print("You've fucked up. Figure out what. ${res['response']}");
+        if (kDebugMode) print("You've fucked up. Figure out what. ${res['response']}");
       }
       return {'error': res['statusCodeError']};
     }
@@ -95,9 +140,7 @@ class _MyAppState extends State<MyApp> {
       'user-agent': 'Cider/$version',
     });
     if (res['statusCodeError'] != null) {
-      if (kDebugMode) {
-        print("Error fetching developer token: ${res['statusCodeError']}");
-      }
+      if (kDebugMode) print("Error fetching developer token: ${res['statusCodeError']}");
       return;
     }
 
@@ -133,16 +176,12 @@ class _MyAppState extends State<MyApp> {
           });
         }
       } on PlatformException catch (e) {
-        if (kDebugMode) {
-          print(e.message);
-        }
+        if (kDebugMode) print(e.message);
         setState(() {
           _isAuthenticated = false;
         });
       } on Exception catch (e) {
-        if (kDebugMode) {
-          print(e.toString());
-        }
+        if (kDebugMode) print(e.toString());
         setState(() {
           _isAuthenticated = false;
         });
@@ -243,9 +282,7 @@ class _MyAppState extends State<MyApp> {
                   ),
                 ],
                 onTap: (index) {
-                  if (kDebugMode) {
-                    print('index $index');
-                  }
+                  if (kDebugMode) print('index $index');
                   setState(() {
                     _page = index;
                   });
