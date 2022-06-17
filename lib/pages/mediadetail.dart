@@ -4,8 +4,9 @@ import 'package:cider_mobile/misc.dart';
 
 class MediaDetailItem extends StatelessWidget {
   final Map<String, dynamic> attributes;
+  final int index;
 
-  const MediaDetailItem({Key? key, required this.attributes}) : super(key: key);
+  const MediaDetailItem({Key? key, required this.index, required this.attributes}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -16,10 +17,16 @@ class MediaDetailItem extends StatelessWidget {
       ),
       padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 4),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         mainAxisSize: MainAxisSize.min,
         children: [
-          // image goes here
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+            child: Text(
+              "$index.",
+              style: Theme.of(context).primaryTextTheme.headline4,
+            ),
+          ),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -32,7 +39,7 @@ class MediaDetailItem extends StatelessWidget {
                   textAlign: TextAlign.left,
                 ),
                 Text(
-                  "${attributes['artistName']} - ${attributes['albumName']}",
+                  "${attributes['artistName']} — ${attributes['albumName']}",
                   style: Theme.of(context).textTheme.subtitle1,
                   softWrap: false,
                   overflow: TextOverflow.fade,
@@ -61,7 +68,7 @@ class MediaDetail extends StatefulWidget {
 class _MediaDetailState extends State<MediaDetail> {
   var _name = "Track View";
   var _artist = "";
-  var _tracks = <Map<String, dynamic>>[];
+  final _tracks = <Map<String, dynamic>>[];
 
   void _init() async {
     final res = await widget.amAPICall(
@@ -101,6 +108,7 @@ class _MediaDetailState extends State<MediaDetail> {
     var tracks = _tracks.map((e) => Padding(
           padding: const EdgeInsets.symmetric(vertical: 1),
           child: MediaDetailItem(
+            index: _tracks.indexOf(e) + 1,
             attributes: e,
           ),
         ));
