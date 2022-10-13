@@ -78,7 +78,18 @@ class _MediaDetailState extends State<MediaDetail> {
 
     setState(() {
       _name = res['data'][0]['attributes']['name'];
-      _artist = res['data'][0]['attributes'][widget.type == MediaType.playlist ? 'curatorName' : 'artistName'];
+
+      switch (widget.type) {
+        case MediaType.album:
+        case MediaType.song:
+          _artist = res['data'][0]['attributes']['artistName'];
+          break;
+        case MediaType.playlist:
+          _artist = res['data'][0]['attributes']['curatorName'];
+          break;
+        default:
+          _artist = "";
+      }
     });
 
     var tracks = res['data'][0]['relationships']['tracks']['data'].map((e) => e['id']);

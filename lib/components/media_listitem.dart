@@ -22,6 +22,7 @@ class _MediaListItemState extends State<MediaListItem> {
 
   void _fetchAlbum() async {
     if (widget.id == "") return;
+    if (widget.type == MediaType.unknown) return;
 
     // TODO: Proper Storefront ID handling
     final res = await widget.amAPICall(
@@ -80,19 +81,36 @@ class _MediaListItemState extends State<MediaListItem> {
             height: constraints.maxWidth,
           );
 
+          if (widget.type != MediaType.song) print(_attributes);
+
           name = _attributes!['name'];
-          if (widget.type != MediaType.playlist) {
-            artistName = _attributes!['artistName'];
-          } else {
-            artistName = _attributes!['description']['standard'];
+          switch (widget.type) {
+            case MediaType.playlist:
+              //artistName = _attributes!['description']['short'];
+              artistName = _attributes!['curatorName'];
+              break;
+            case MediaType.station:
+              artistName = "Station";
+              break;
+            default:
+              artistName = _attributes!['artistName'];
           }
+
+          print("MediaListItem: $name");
+          print("Artist Name: $artistName");
 
           if (name == "") name = "Unknown ${widget.type.name}";
           if (artistName == "") artistName = "Unknown Artist";
 
-          bgColor = Color(0xFF000000 | int.parse(_attributes!['artwork']['bgColor'], radix: 16));
-          txtColor1 = Color(0xFF000000 | int.parse(_attributes!['artwork']['textColor1'], radix: 16));
-          txtColor2 = Color(0xFF000000 | int.parse(_attributes!['artwork']['textColor3'], radix: 16));
+          if (_attributes!['artwork']['bgColor'] != null) {
+            bgColor = Color(0xFF000000 | int.parse(_attributes!['artwork']['bgColor'], radix: 16));
+          }
+          if (_attributes!['artwork']['textColor1'] != null) {
+            txtColor1 = Color(0xFF000000 | int.parse(_attributes!['artwork']['textColor1'], radix: 16));
+          }
+          if (_attributes!['artwork']['textColor3'] != null) {
+            txtColor2 = Color(0xFF000000 | int.parse(_attributes!['artwork']['textColor3'], radix: 16));
+          }
         }
 
         return ClipPath(
@@ -104,7 +122,7 @@ class _MediaListItemState extends State<MediaListItem> {
           child: ElevatedButton(
             onPressed: widget.onTap,
             style: ElevatedButton.styleFrom(
-              primary: bgColor,
+              backgroundColor: bgColor,
               //splashFactory: NoSplash.splashFactory,
               maximumSize: Size(constraints.maxWidth, double.infinity),
               padding: EdgeInsets.zero,

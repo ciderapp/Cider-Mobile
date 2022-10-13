@@ -22,14 +22,19 @@ class _HomeScreenState extends State<HomeScreen> {
     var res = await widget.amAPICall("me/recent/played", {
       "limit": 10,
     });
-    if (res['errors'] != null) return;
+    if (res['error'] != null && res['errors'] != null) return;
 
     setState(() {
       for (final song in res['data']) {
+        print(song);
+        print(song['id']);
+        print(song['type']);
         _recentlyPlayed.addEntries(
           <MapEntry<String, MediaType>>[
             MapEntry<String, MediaType>(
-                song['id'], MediaType.values.firstWhere((element) => "${element.name}s" == song['type'])),
+                song['id'],
+                MediaType.values
+                    .firstWhere((element) => "${element.name}s" == song['type'], orElse: () => MediaType.unknown)),
           ],
         );
       }

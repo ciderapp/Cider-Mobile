@@ -53,7 +53,7 @@ class RoundedNavBarItem extends StatelessWidget {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(10),
         ),
-        primary: Colors.transparent,
+        backgroundColor: Colors.transparent,
         shadowColor: Colors.transparent,
         splashFactory: NoSplash.splashFactory,
       ),

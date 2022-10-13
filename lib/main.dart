@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -35,45 +36,50 @@ Future<dynamic> getJson(String uri, dynamic headers) async {
 }
 
 Future<dynamic> getJsonCache(String uri, dynamic headers) async {
-  final res = await DefaultCacheManager().getSingleFile(
-    uri,
-    headers: headers,
-  );
+  try {
+    final res = await DefaultCacheManager().getSingleFile(
+      uri,
+      headers: headers,
+    );
 
-  if (await res.exists()) {
-    return json.decode(await res.readAsString());
-  }
+    if (await res.exists()) {
+      return json.decode(await res.readAsString());
+    }
 
-  // Try normal request, then actually fail
-  var url = Uri.parse(uri);
-  final response = await http.get(url, headers: headers);
-  if (response.statusCode == 200) {
-    if (kDebugMode) print("Fetched from network.");
+    // Try normal request, then actually fail
+    var url = Uri.parse(uri);
+    final response = await http.get(url, headers: headers);
+    if (response.statusCode == 200) {
+      if (kDebugMode) print("Fetched from network.");
 
-    // Shamelessly stolen from flutter_cache_manager src lol
-    var ageDuration = const Duration(days: 7);
-    final controlHeader = response.headers['Cache-Control'];
-    if (controlHeader != null) {
-      final controlSettings = controlHeader.split(',');
-      for (final setting in controlSettings) {
-        final sanitizedSetting = setting.trim().toLowerCase();
-        if (sanitizedSetting == 'no-cache') {
-          ageDuration = const Duration();
-        }
-        if (sanitizedSetting.startsWith('max-age=')) {
-          var validSeconds = int.tryParse(sanitizedSetting.split('=')[1]) ?? 0;
-          if (validSeconds > 0) {
-            ageDuration = Duration(seconds: validSeconds);
+      // Shamelessly stolen from flutter_cache_manager src lol
+      var ageDuration = const Duration(days: 7);
+      final controlHeader = response.headers['Cache-Control'];
+      if (controlHeader != null) {
+        final controlSettings = controlHeader.split(',');
+        for (final setting in controlSettings) {
+          final sanitizedSetting = setting.trim().toLowerCase();
+          if (sanitizedSetting == 'no-cache') {
+            ageDuration = const Duration();
+          }
+          if (sanitizedSetting.startsWith('max-age=')) {
+            var validSeconds = int.tryParse(sanitizedSetting.split('=')[1]) ?? 0;
+            if (validSeconds > 0) {
+              ageDuration = Duration(seconds: validSeconds);
+            }
           }
         }
       }
+
+      await DefaultCacheManager().putFile(uri, response.bodyBytes, eTag: response.headers['etag'], maxAge: ageDuration);
+      return json.decode(response.body);
     }
 
-    await DefaultCacheManager().putFile(uri, response.bodyBytes, eTag: response.headers['etag'], maxAge: ageDuration);
-    return json.decode(response.body);
+    return {'statusCodeError': response.statusCode, 'response': response.body};
+  } on HttpException catch (e) {
+    var error = int.tryParse(e.message.replaceAll(RegExp(r'[^0-9]'), ''));
+    return {'statusCodeError': error};
   }
-
-  return {'statusCodeError': response.statusCode, 'response': response.body};
 }
 
 class MyApp extends StatefulWidget {
@@ -109,6 +115,9 @@ class _MyAppState extends State<MyApp> {
     final headers = {
       'Authorization': 'Bearer $_devToken',
       'Music-User-Token': _usrToken,
+      // fuck you apple
+      'origin': 'https://beta.music.apple.com',
+      'referer': 'https://beta.music.apple.com/',
     };
     final queryString = query?.entries.map((entry) {
       return '${entry.key}=${entry.value}';
@@ -121,9 +130,9 @@ class _MyAppState extends State<MyApp> {
       setState(() {
         _errorMessage = "Call to amAPI endpoint $endpoint failed with status code ${res['statusCodeError']}";
       });
-      if (res['statusCodeError'] == 400) {
-        if (kDebugMode) print("You've fucked up. Figure out what. ${res['response']}");
-      }
+      // TODO: Create a consistent error system/syntax
+      if (kDebugMode) print("You've fucked up. Figure out what. ${res['statusCodeError']} ${res['response']}");
+      setState(() => _hasErrored = true);
       return {'error': res['statusCodeError']};
     }
 
@@ -149,19 +158,21 @@ class _MyAppState extends State<MyApp> {
 
     var usrToken = await storage.read(key: "usrToken");
     if (usrToken != null) {
+      _usrToken = usrToken;
       // Verify user token
       final res = await amAPI("me/library/songs", {
         'limit': 1,
       });
-      if (res['statusCodeError'] != null) {
+      print(res);
+      if (res['error'] != null) {
         // Invalid token, delete it
         await storage.delete(key: "usrToken");
       } else if (res['errors'] == null) {
         setState(() {
-          _usrToken = usrToken;
           _isAuthenticated = true;
         });
       }
+      _hasErrored = false;
     }
 
     if (!_isAuthenticated) {
