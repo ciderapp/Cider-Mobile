@@ -150,6 +150,10 @@ class _MyAppState extends State<MyApp> {
     });
     if (res['statusCodeError'] != null) {
       if (kDebugMode) print("Error fetching developer token: ${res['statusCodeError']}");
+      // TODO: Check if internet is connected
+      setState(() {
+        _errorMessage = "Error fetching Apple Music Token. Cider API may be down.";
+      });
       return;
     }
 
@@ -161,9 +165,8 @@ class _MyAppState extends State<MyApp> {
       _usrToken = usrToken;
       // Verify user token
       final res = await amAPI("me/library/songs", {
-        'limit': 1,
+        'limit': 10,
       });
-      print(res);
       if (res['error'] != null) {
         // Invalid token, delete it
         await storage.delete(key: "usrToken");
