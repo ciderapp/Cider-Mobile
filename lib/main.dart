@@ -215,6 +215,15 @@ class _MyAppState extends State<MyApp> {
     super.initState();
 
     _musicKitAuthentication();
+
+    mkChannel.invokeMethod('initPlayer', {'devToken': _devToken, 'usrToken': _usrToken}).ignore();
+    print("test?");
+  }
+
+  @override
+  void dispose() {
+    mkChannel.invokeMethod('destroyPlayer');
+    super.dispose();
   }
 
   // Rendering
