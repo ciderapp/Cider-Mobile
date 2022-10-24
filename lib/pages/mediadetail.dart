@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 
 import 'package:cider_mobile/misc.dart';
+import 'package:cider_mobile/http/amapi.dart';
 
 class MediaDetailItem extends StatelessWidget {
-  final Map<String, dynamic> attributes;
+  final JSON attributes;
   final int index;
 
   const MediaDetailItem({Key? key, required this.index, required this.attributes}) : super(key: key);
@@ -55,11 +56,11 @@ class MediaDetailItem extends StatelessWidget {
 }
 
 class MediaDetail extends StatefulWidget {
-  final AMAPICallback amAPICall;
+  final AMAPI amAPI;
   final String id;
   final MediaType type;
 
-  const MediaDetail({Key? key, required this.amAPICall, required this.id, required this.type}) : super(key: key);
+  const MediaDetail({Key? key, required this.amAPI, required this.id, required this.type}) : super(key: key);
 
   @override
   State<MediaDetail> createState() => _MediaDetailState();
@@ -68,41 +69,43 @@ class MediaDetail extends StatefulWidget {
 class _MediaDetailState extends State<MediaDetail> {
   var _name = "Track View";
   var _artist = "";
-  final _tracks = <Map<String, dynamic>>[];
+  final _tracks = <JSON>[];
 
   void _init() async {
-    final res = await widget.amAPICall(
-      "catalog/us/${widget.type.name}s/${widget.id}",
-    );
-    if (res['error'] != null) return;
+    final res = await widget.amAPI.catalog('${widget.type.name}s/${widget.id}');
+    if (res is List<AMError>) {
+      return;
+    }
 
     setState(() {
-      _name = res['data'][0]['attributes']['name'];
+      _name = res[0]['attributes']['name'];
 
       switch (widget.type) {
         case MediaType.album:
         case MediaType.song:
-          _artist = res['data'][0]['attributes']['artistName'];
+          _artist = res[0]['attributes']['artistName'];
           break;
         case MediaType.playlist:
-          _artist = res['data'][0]['attributes']['curatorName'];
+          _artist = res[0]['attributes']['curatorName'];
           break;
         default:
           _artist = "";
       }
     });
 
-    var tracks = res['data'][0]['relationships']['tracks']['data'].map((e) => e['id']);
+    var tracks = res[0]['relationships']['tracks']['data'].map((e) => e['id']);
 
     // Stupid Apple limitation
     for (var i = 0; i < tracks.length; i += 300) {
       var query = [...tracks].skip(i).take(300).join(",");
-      final res = await widget.amAPICall(
-        "catalog/us/songs?ids=$query",
-      );
-      if (res['error'] != null) return;
+      final res = await widget.amAPI.catalog('songs', {
+        'ids': query,
+      });
+      if (res is List<AMError>) {
+        return;
+      }
 
-      res['data'].forEach((e) => _tracks.add(e['attributes']));
+      res.forEach((e) => _tracks.add(e['attributes']));
     }
 
     setState(() {});

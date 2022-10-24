@@ -3,14 +3,15 @@ import 'package:flutter/material.dart';
 
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:cider_mobile/misc.dart';
+import 'package:cider_mobile/http/amapi.dart';
 
 class MediaListItem extends StatefulWidget {
-  final AMAPICallback amAPICall;
+  final AMAPI amAPI;
   final String id;
   final MediaType type;
   final VoidCallback onTap;
 
-  const MediaListItem({Key? key, required this.amAPICall, required this.id, required this.type, required this.onTap})
+  const MediaListItem({Key? key, required this.amAPI, required this.id, required this.type, required this.onTap})
       : super(key: key);
 
   @override
@@ -18,21 +19,19 @@ class MediaListItem extends StatefulWidget {
 }
 
 class _MediaListItemState extends State<MediaListItem> {
-  Map<String, dynamic>? _attributes;
+  JSON? _attributes;
 
   void _fetchAlbum() async {
     if (widget.id == "") return;
     if (widget.type == MediaType.unknown) return;
 
-    // TODO: Proper Storefront ID handling
-    final res = await widget.amAPICall(
-      "catalog/us/${widget.type.name}s/${widget.id}",
-    );
-
-    if (res['error'] != null) return;
+    final res = await widget.amAPI.catalog('${widget.type.name}s/${widget.id}');
+    if (res is List<AMError>) {
+      return;
+    }
 
     setState(() {
-      _attributes = res['data'][0]['attributes'];
+      _attributes = res[0]['attributes'];
     });
   }
 
@@ -81,7 +80,7 @@ class _MediaListItemState extends State<MediaListItem> {
             height: constraints.maxWidth,
           );
 
-          if (widget.type != MediaType.song) print(_attributes);
+          //if (widget.type != MediaType.song) print(_attributes);
 
           name = _attributes!['name'];
           switch (widget.type) {
@@ -96,8 +95,8 @@ class _MediaListItemState extends State<MediaListItem> {
               artistName = _attributes!['artistName'];
           }
 
-          print("MediaListItem: $name");
-          print("Artist Name: $artistName");
+          //print("MediaListItem: $name");
+          //print("Artist Name: $artistName");
 
           if (name == "") name = "Unknown ${widget.type.name}";
           if (artistName == "") artistName = "Unknown Artist";

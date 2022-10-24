@@ -1,4 +1,4 @@
-typedef AMAPICallback = Future<Map<String, dynamic>> Function(String, [Map<String, dynamic>?]);
+T? cast<T>(x) => x is T ? x : null;
 
 enum MediaType {
   unknown,

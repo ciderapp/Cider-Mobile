@@ -1,3 +1,4 @@
+import 'package:cider_mobile/http/amapi.dart';
 import 'package:flutter/material.dart';
 import 'basepage.dart';
 
@@ -6,7 +7,7 @@ import 'package:cider_mobile/pages/mediadetail.dart';
 import 'package:cider_mobile/components/media_listitem.dart';
 
 class HomeScreen extends BasePage {
-  const HomeScreen({Key? key, required super.amAPICall}) : super(key: key);
+  const HomeScreen({Key? key, required super.amAPI}) : super(key: key);
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -19,16 +20,18 @@ class _HomeScreenState extends State<HomeScreen> {
   // This is where you'll get the song data from the Apple Music API
   // (among other things)
   Future<void> asyncInit() async {
-    var res = await widget.amAPICall("me/recent/played", {
-      "limit": 10,
+    var res = await widget.amAPI.me("recent/played", {
+      "limit": "10",
     });
-    if (res['error'] != null && res['errors'] != null) return;
+    if (res is List<AMError>) {
+      return;
+    }
 
     setState(() {
-      for (final song in res['data']) {
-        print(song);
-        print(song['id']);
-        print(song['type']);
+      for (final song in res) {
+        //print(song);
+        //print(song['id']);
+        //print(song['type']);
         _recentlyPlayed.addEntries(
           <MapEntry<String, MediaType>>[
             MapEntry<String, MediaType>(
@@ -40,13 +43,17 @@ class _HomeScreenState extends State<HomeScreen> {
       }
     });
 
-    res = await widget.amAPICall("me/recommendations", {
-      "limit": 10,
+    res = await widget.amAPI.me("recommendations", {
+      "limit": "10",
     });
-    if (res['errors'] != null) return;
+    if (res is List<AMError>) {
+      return;
+    }
+
+    //print(res[0]['relationships']['contents']['data']);
 
     setState(() {
-      for (final song in res['data'][0]['relationships']['contents']['data']) {
+      for (final song in res[0]['relationships']['contents']['data']) {
         _madeforyou.addEntries(
           <MapEntry<String, MediaType>>[
             MapEntry<String, MediaType>(
@@ -83,14 +90,14 @@ class _HomeScreenState extends State<HomeScreen> {
           child: SizedBox(
             width: 200,
             child: MediaListItem(
-              amAPICall: widget.amAPICall,
+              amAPI: widget.amAPI,
               id: e.key,
               type: e.value,
               onTap: () {
                 Navigator.of(context).push(
                   MaterialPageRoute(
                     builder: (context) => MediaDetail(
-                      amAPICall: widget.amAPICall,
+                      amAPI: widget.amAPI,
                       id: e.key,
                       type: e.value,
                     ),
@@ -120,14 +127,14 @@ class _HomeScreenState extends State<HomeScreen> {
           child: SizedBox(
             width: 200,
             child: MediaListItem(
-              amAPICall: widget.amAPICall,
+              amAPI: widget.amAPI,
               id: e.key,
               type: e.value,
               onTap: () {
                 Navigator.of(context).push(
                   MaterialPageRoute(
                     builder: (context) => MediaDetail(
-                      amAPICall: widget.amAPICall,
+                      amAPI: widget.amAPI,
                       id: e.key,
                       type: e.value,
                     ),

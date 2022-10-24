@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
-import 'package:cider_mobile/misc.dart';
+import 'package:cider_mobile/http/amapi.dart';
 
 abstract class BasePage extends StatefulWidget {
-  final AMAPICallback amAPICall;
+  final AMAPI amAPI;
 
-  const BasePage({Key? key, required this.amAPICall}) : super(key: key);
+  const BasePage({Key? key, required this.amAPI}) : super(key: key);
 }

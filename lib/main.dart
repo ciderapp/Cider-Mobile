@@ -1,12 +1,6 @@
-import 'dart:convert';
-import 'dart:io';
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-
-import 'package:http/http.dart' as http;
-import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -14,6 +8,10 @@ import 'package:package_info_plus/package_info_plus.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 import 'components/rounded_navbar.dart';
+
+import 'misc.dart';
+import 'http/json.dart';
+import 'http/amapi.dart';
 
 // Pages
 import 'pages/home.dart';
@@ -23,63 +21,6 @@ import 'pages/radio.dart';
 
 void main() {
   runApp(const MyApp());
-}
-
-Future<dynamic> getJson(String uri, dynamic headers) async {
-  var url = Uri.parse(uri);
-  final response = await http.get(url, headers: headers);
-  if (response.statusCode == 200) {
-    return json.decode(response.body);
-  }
-
-  return {'statusCodeError': response.statusCode, 'response': response.body};
-}
-
-Future<dynamic> getJsonCache(String uri, dynamic headers) async {
-  try {
-    final res = await DefaultCacheManager().getSingleFile(
-      uri,
-      headers: headers,
-    );
-
-    if (await res.exists()) {
-      return json.decode(await res.readAsString());
-    }
-
-    // Try normal request, then actually fail
-    var url = Uri.parse(uri);
-    final response = await http.get(url, headers: headers);
-    if (response.statusCode == 200) {
-      if (kDebugMode) print("Fetched from network.");
-
-      // Shamelessly stolen from flutter_cache_manager src lol
-      var ageDuration = const Duration(days: 7);
-      final controlHeader = response.headers['Cache-Control'];
-      if (controlHeader != null) {
-        final controlSettings = controlHeader.split(',');
-        for (final setting in controlSettings) {
-          final sanitizedSetting = setting.trim().toLowerCase();
-          if (sanitizedSetting == 'no-cache') {
-            ageDuration = const Duration();
-          }
-          if (sanitizedSetting.startsWith('max-age=')) {
-            var validSeconds = int.tryParse(sanitizedSetting.split('=')[1]) ?? 0;
-            if (validSeconds > 0) {
-              ageDuration = Duration(seconds: validSeconds);
-            }
-          }
-        }
-      }
-
-      await DefaultCacheManager().putFile(uri, response.bodyBytes, eTag: response.headers['etag'], maxAge: ageDuration);
-      return json.decode(response.body);
-    }
-
-    return {'statusCodeError': response.statusCode, 'response': response.body};
-  } on HttpException catch (e) {
-    var error = int.tryParse(e.message.replaceAll(RegExp(r'[^0-9]'), ''));
-    return {'statusCodeError': error};
-  }
 }
 
 class MyApp extends StatefulWidget {
@@ -101,43 +42,12 @@ class _MyAppState extends State<MyApp> {
   String _devToken = "";
   String _usrToken = "";
 
+  AMAPI? _amAPI;
+
   bool _isAuthenticated = false;
 
   bool _hasErrored = false;
   String _errorMessage = "";
-
-  // MusicKit API
-  Future<Map<String, dynamic>> amAPI(String endpoint, [Map<String, dynamic>? query]) async {
-    if (_usrToken.isEmpty) {
-      return {'error': 'User token is empty'};
-    }
-
-    final headers = {
-      'Authorization': 'Bearer $_devToken',
-      'Music-User-Token': _usrToken,
-      // fuck you apple
-      'origin': 'https://beta.music.apple.com',
-      'referer': 'https://beta.music.apple.com/',
-    };
-    final queryString = query?.entries.map((entry) {
-      return '${entry.key}=${entry.value}';
-    }).join('&');
-
-    final uri = "https://api.music.apple.com/v1/$endpoint${queryString != null ? '?$queryString' : ''}";
-    if (kDebugMode) print('amAPI: $uri');
-    final res = await getJsonCache(uri, headers);
-    if (res['statusCodeError'] != null) {
-      setState(() {
-        _errorMessage = "Call to amAPI endpoint $endpoint failed with status code ${res['statusCodeError']}";
-      });
-      // TODO: Create a consistent error system/syntax
-      if (kDebugMode) print("You've fucked up. Figure out what. ${res['statusCodeError']} ${res['response']}");
-      setState(() => _hasErrored = true);
-      return {'error': res['statusCodeError']};
-    }
-
-    return res;
-  }
 
   // MusicKit initialization
   Future<void> _musicKitAuthentication() async {
@@ -148,8 +58,8 @@ class _MyAppState extends State<MyApp> {
     final res = await getJson("https://api.cider.sh/v1", {
       'user-agent': 'Cider/$version',
     });
-    if (res['statusCodeError'] != null) {
-      if (kDebugMode) print("Error fetching developer token: ${res['statusCodeError']}");
+    if (res.statusCode != 200) {
+      if (kDebugMode) print("Error fetching developer token: ${res.statusCode}");
       // TODO: Check if internet is connected
       setState(() {
         _errorMessage = "Error fetching Apple Music Token. Cider API may be down.";
@@ -158,24 +68,21 @@ class _MyAppState extends State<MyApp> {
     }
 
     // Not in a 'setState' because this does not change the state of the app
-    _devToken = res['token'];
+    _devToken = res.json['token'];
 
     var usrToken = await storage.read(key: "usrToken");
     if (usrToken != null) {
       _usrToken = usrToken;
+
       // Verify user token
-      final res = await amAPI("me/library/songs", {
-        'limit': 10,
-      });
-      if (res['error'] != null) {
-        // Invalid token, delete it
-        await storage.delete(key: "usrToken");
-      } else if (res['errors'] == null) {
+      try {
+        _amAPI = await AMAPI.create(_devToken, _usrToken);
         setState(() {
           _isAuthenticated = true;
         });
+      } on AMException catch (e) {
+        e.statusCode != 401 ? throw e : await storage.delete(key: "usrToken");
       }
-      _hasErrored = false;
     }
 
     if (!_isAuthenticated) {
@@ -194,12 +101,12 @@ class _MyAppState extends State<MyApp> {
         setState(() {
           _isAuthenticated = false;
         });
-      } on Exception catch (e) {
+      } /* on Exception catch (e) {
         if (kDebugMode) print(e.toString());
         setState(() {
           _isAuthenticated = false;
         });
-      }
+      } */
     }
 
     if (!_isAuthenticated) {
@@ -208,6 +115,8 @@ class _MyAppState extends State<MyApp> {
         _errorMessage = "Failed to authenticate user";
       });
     }
+
+    _amAPI = await AMAPI.create(_devToken, _usrToken);
   }
 
   @override
@@ -260,7 +169,7 @@ class _MyAppState extends State<MyApp> {
 
     // Create Screens
     final List<Widget> pages = [
-      HomeScreen(amAPICall: amAPI),
+      HomeScreen(amAPI: _amAPI!),
       const ListenScreen(),
       const BrowseScreen(),
       const RadioScreen(),
